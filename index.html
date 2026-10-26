@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>꿈끼나비 · 나만의 진로·학과 매칭 내비게이터</title>
+<meta name="description" content="흥미, 성격, 좋아하는 활동을 입력하면 어울리는 대학 학과와 직업을 추천해 주는 진로 탐색 웹앱">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦋</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --brand:#4f46e5; --brand-2:#6366f1; --brand-3:#3b82f6; --brand-soft:#eef2ff; --brand-ink:#3730a3;
+  --mint:#10b981; --mint-soft:#d1fae5; --coral:#f97362; --amber:#f59e0b;
+  --bg:#f4f6fb; --card:#ffffff; --card-2:#f8f9fc; --line:#e3e7f0;
+  --text:#18183a; --text-2:#4b5170; --muted:#7c829c;
+  --shadow:0 1px 2px rgba(20,24,60,.04),0 8px 24px rgba(30,40,110,.07);
+  --shadow-hover:0 2px 4px rgba(20,24,60,.06),0 14px 34px rgba(60,60,180,.14);
+  --radius:20px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --brand:#818cf8; --brand-2:#a5b4fc; --brand-3:#60a5fa; --brand-soft:#26285a; --brand-ink:#c7d2fe;
+    --mint:#34d399; --mint-soft:#0f3d31; --coral:#fb8a7b;
+    --bg:#0e1022; --card:#171a33; --card-2:#1d2140; --line:#2b3058;
+    --text:#eceefb; --text-2:#c2c6e2; --muted:#8e94b8;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+    --shadow-hover:0 2px 4px rgba(0,0,0,.35),0 14px 34px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --brand:#818cf8; --brand-2:#a5b4fc; --brand-3:#60a5fa; --brand-soft:#26285a; --brand-ink:#c7d2fe;
+  --mint:#34d399; --mint-soft:#0f3d31; --coral:#fb8a7b;
+  --bg:#0e1022; --card:#171a33; --card-2:#1d2140; --line:#2b3058;
+  --text:#eceefb; --text-2:#c2c6e2; --muted:#8e94b8;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+  --shadow-hover:0 2px 4px rgba(0,0,0,.35),0 14px 34px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.6;word-break:keep-all;overflow-x:hidden;transition:background .3s,color .3s}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--brand-2);outline-offset:2px;border-radius:10px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wrap{max-width:880px;margin:0 auto;padding:0 16px}
+
+/* top bar */
+.topbar{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:18px;background:none;border:0;padding:4px 2px}
+.logo small{font-weight:600;color:var(--muted);font-size:12px}
+.top-actions{display:flex;gap:6px}
+.icon-btn{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 12px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-weight:600;font-size:14px;transition:transform .15s,box-shadow .2s}
+.icon-btn:hover{box-shadow:var(--shadow)}
+.icon-btn:active{transform:scale(.96)}
+
+/* hero (SchoolKit) */
+.hero{position:relative;overflow:hidden;margin-top:18px;border-radius:24px;padding:30px 26px 34px;color:#fff;background:linear-gradient(135deg,#4338ca 0%,#4f46e5 38%,#3b82f6 100%)}
+.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.09)}
+.hero::before{content:"";position:absolute;right:70px;bottom:-90px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.07)}
+.sk-pill{display:inline-block;background:#fff;color:#4338ca;font-weight:800;font-size:12px;letter-spacing:.04em;padding:5px 12px;border-radius:999px}
+.hero h1{margin:14px 0 6px;font-size:clamp(28px,6vw,40px);font-weight:900;letter-spacing:-.02em;line-height:1.2}
+.hero p{margin:0;opacity:.92;font-size:15.5px;max-width:520px}
+.hero .bfly{position:absolute;right:26px;top:24px;font-size:54px;animation:hover 3.4s ease-in-out infinite;z-index:1}
+@keyframes hover{0%,100%{transform:translate(0,0) rotate(-6deg)}50%{transform:translate(-8px,-10px) rotate(6deg)}}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+.section{margin-top:16px}
+h2.sec-title{font-size:19px;margin:0 0 4px;font-weight:800;letter-spacing:-.01em}
+.sec-sub{margin:0 0 14px;color:var(--muted);font-size:14px}
+
+/* step bar */
+.stepbar{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;overflow:hidden}
+.stepbar .st{display:flex;align-items:center;gap:7px;flex:1;min-width:0;padding:8px 10px;border-radius:999px;background:var(--card-2);color:var(--muted);font-weight:700;font-size:13.5px;transition:all .25s}
+.stepbar .st .n{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--line);color:var(--text-2);font-size:12.5px;font-weight:800}
+.stepbar .st span.t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stepbar .st.on{background:var(--brand-soft);color:var(--brand-ink)}
+.stepbar .st.on .n{background:var(--brand);color:#fff}
+.stepbar .st.done .n{background:var(--brand-2);color:#fff}
+.stepbar .st.last .n{background:var(--mint-soft);color:var(--mint)}
+.stepbar .st.last.on{background:var(--mint-soft);color:var(--mint)}
+.stepbar .st.last.on .n{background:var(--mint);color:#fff}
+.progress{height:6px;border-radius:99px;background:var(--line);margin-top:12px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand),var(--brand-3));border-radius:99px;transition:width .4s ease}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 22px;border-radius:15px;border:0;font-weight:800;font-size:16px;transition:transform .15s,box-shadow .2s,background .2s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--brand);color:#fff;box-shadow:0 6px 18px rgba(79,70,229,.3)}
+:root[data-theme="dark"] .btn-primary{color:#11132a}
+.btn-primary:hover{box-shadow:0 10px 26px rgba(79,70,229,.4);transform:translateY(-1px)}
+.btn-ghost{background:var(--card);border:1.5px solid var(--line);color:var(--text)}
+.btn-ghost:hover{border-color:var(--brand-2)}
+.btn-mint{background:var(--mint);color:#fff}
+.btn-big{min-height:62px;font-size:18px;width:100%;border-radius:18px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+.btn-row .btn{flex:1;min-width:130px}
+.linkish{background:none;border:0;color:var(--brand);font-weight:700;padding:4px;text-decoration:underline;text-underline-offset:3px}
+
+/* home */
+.feat{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.feat .f{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.feat .f b{display:block;font-size:15px;margin:6px 0 2px}
+.feat .f p{margin:0;color:var(--muted);font-size:13.5px}
+.feat .f .em{font-size:26px}
+.recent{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);font-weight:600;font-size:14.5px;transition:all .16s}
+.chip:hover{border-color:var(--brand-2);transform:translateY(-1px)}
+.chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 4px 12px rgba(79,70,229,.25)}
+:root[data-theme="dark"] .chip[aria-pressed="true"]{color:#11132a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip[aria-pressed="true"]{color:#11132a}:root:not([data-theme="light"]) .btn-primary{color:#11132a}}
+.chip.sm{min-height:30px;padding:0 10px;font-size:12.5px;cursor:default;border-width:1px}
+.chip.sm:hover{transform:none;border-color:var(--line)}
+.group-label{display:flex;justify-content:space-between;align-items:baseline;margin:20px 0 10px}
+.group-label:first-child{margin-top:4px}
+.group-label b{font-size:15.5px}
+.group-label .cnt{color:var(--brand);font-weight:700;font-size:13px}
+.field{width:100%;min-height:48px;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--card-2);font-size:15px;transition:border .2s}
+.field:focus{outline:none;border-color:var(--brand-2);background:var(--card)}
+textarea.field{min-height:84px;resize:vertical}
+.kw-preview{margin-top:8px;font-size:13px;color:var(--muted);min-height:20px}
+.kw-preview em{font-style:normal;color:var(--brand);font-weight:700}
+
+/* sliders */
+.slider{padding:14px 0;border-bottom:1px dashed var(--line)}
+.slider:last-child{border-bottom:0}
+.slider .ends{display:flex;justify-content:space-between;font-weight:700;font-size:14.5px;margin-bottom:8px;gap:12px}
+.slider .ends span{transition:color .2s}
+.slider .ends .hot{color:var(--brand)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:30px;background:transparent}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:linear-gradient(90deg,var(--brand-soft),var(--line) 50%,var(--brand-soft))}
+input[type=range]::-moz-range-track{height:8px;border-radius:99px;background:var(--line)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;margin-top:-9px;width:26px;height:26px;border-radius:50%;background:var(--brand);border:4px solid var(--card);box-shadow:0 2px 8px rgba(79,70,229,.45)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--brand);border:4px solid var(--card)}
+.ticks{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);padding:0 4px}
+
+.nav-row{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
+.nav-row .btn{flex:1}
+.hint{font-size:13px;color:var(--coral);font-weight:600;min-height:20px;margin-top:8px;text-align:center}
+
+/* loading */
+.loading{display:grid;place-items:center;text-align:center;min-height:62vh}
+.fly-stage{position:relative;width:240px;height:140px;margin:0 auto 10px}
+.fly{position:absolute;left:0;top:50px;animation:path 2.6s ease-in-out infinite}
+.fly svg{width:56px;height:56px;overflow:visible}
+.wing{transform-origin:28px 30px;animation:flap .32s ease-in-out infinite alternate}
+@keyframes flap{from{transform:scaleX(1)}to{transform:scaleX(.25)}}
+@keyframes path{0%{transform:translate(0,10px)}25%{transform:translate(60px,-40px)}50%{transform:translate(120px,10px)}75%{transform:translate(170px,-30px)}100%{transform:translate(0,10px)}}
+.trail{position:absolute;inset:0}
+.load-msg{font-weight:800;font-size:19px;margin:6px 0}
+.load-sub{color:var(--muted);font-size:14px}
+
+/* result */
+.sum-card{background:linear-gradient(135deg,var(--brand-soft),var(--card) 70%);border:1px solid var(--line)}
+.type-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.type-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-weight:800;font-size:13.5px;color:var(--brand-ink)}
+.sum-title{font-size:clamp(22px,4.6vw,28px);font-weight:900;margin:2px 0 6px;letter-spacing:-.02em;line-height:1.3}
+.sum-desc{margin:0 0 14px;color:var(--text-2)}
+.riasec{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:14px}
+.rb{text-align:center}
+.rb .bar{height:84px;border-radius:12px;background:var(--card-2);border:1px solid var(--line);display:flex;align-items:flex-end;overflow:hidden}
+.rb .bar i{display:block;width:100%;background:linear-gradient(180deg,var(--brand-3),var(--brand));border-radius:10px 10px 0 0;height:0;transition:height .9s cubic-bezier(.2,.8,.2,1)}
+.rb.top .bar i{background:linear-gradient(180deg,#34d399,var(--mint))}
+.rb .lb{font-size:12px;font-weight:700;margin-top:5px;color:var(--text-2)}
+.rb .lb small{display:block;font-weight:600;color:var(--muted);font-size:10.5px}
+
+.majors{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.major{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s;display:flex;flex-direction:column}
+.major:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover)}
+.major .rank{position:absolute;top:-10px;left:18px;background:var(--brand);color:#fff;font-weight:800;font-size:12px;padding:3px 10px;border-radius:999px}
+:root[data-theme="dark"] .major .rank{color:#11132a}
+.major.first .rank{background:var(--mint)}
+.major-head{display:flex;gap:14px;align-items:center;margin-bottom:10px}
+.ring{flex:none;width:68px;height:68px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--brand) calc(var(--p)*1%),var(--line) 0)}
+.major.first .ring{background:conic-gradient(var(--mint) calc(var(--p)*1%),var(--line) 0)}
+.ring b{display:grid;place-items:center;width:54px;height:54px;border-radius:50%;background:var(--card);font-size:16px;font-weight:900}
+.ring b small{font-size:10px;font-weight:700}
+.major h3{margin:0;font-size:19px;font-weight:900;letter-spacing:-.01em;line-height:1.3}
+.field-tag{display:inline-block;font-size:12px;font-weight:700;color:var(--brand-ink);background:var(--brand-soft);padding:2px 9px;border-radius:999px;margin-top:4px}
+.why{font-size:13.5px;color:var(--text-2);background:var(--card-2);border-radius:12px;padding:9px 12px;margin:4px 0 10px}
+.why b{color:var(--brand)}
+.kv{font-size:13.5px;margin:6px 0}
+.kv dt{font-weight:800;color:var(--text);margin-bottom:4px;font-size:13px}
+.kv dd{margin:0;color:var(--text-2)}
+.kv .chips{gap:6px}
+.job-mini{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:10px}
+.job-mini button{border:1px solid var(--line);background:var(--card-2);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:700;transition:all .15s}
+.job-mini button:hover{border-color:var(--brand);color:var(--brand)}
+
+.jobs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.job{text-align:left;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s}
+.job:hover{transform:translateY(-3px) scale(1.01);box-shadow:var(--shadow-hover)}
+.job .je{font-size:24px}
+.job b{display:block;font-size:15.5px;margin:4px 0 2px}
+.job span{display:block;font-size:12.5px;color:var(--muted)}
+.job .more{color:var(--brand);font-weight:700;font-size:12.5px;margin-top:6px}
+
+.more-list{display:grid;gap:8px}
+.more-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;transition:all .15s}
+.more-item:hover{border-color:var(--brand-2);transform:translateX(3px)}
+.more-item .pct{flex:none;font-weight:900;color:var(--brand);width:48px}
+.more-item .nm{font-weight:800;flex:1}
+.more-item .fl{font-size:12px;color:var(--muted)}
+.minibar{flex:none;width:70px;height:6px;border-radius:9px;background:var(--line);overflow:hidden}
+.minibar i{display:block;height:100%;background:var(--brand)}
+
+.note{font-size:13px;color:var(--muted);background:var(--card-2);border:1px dashed var(--line);border-radius:14px;padding:12px 14px}
+.note a{color:var(--brand);font-weight:700}
+
+.fade-in{opacity:0;transform:translateY(14px);animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes fadeUp{to{opacity:1;transform:none}}
+
+/* history */
+.hist-item{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px;transition:border .2s}
+.hist-item.sel{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.hist-item input[type=checkbox]{width:22px;height:22px;margin-top:2px;accent-color:var(--brand);flex:none}
+.hist-item .meta{flex:1;min-width:0}
+.hist-item .meta b{display:block;font-size:15.5px}
+.hist-item .meta small{color:var(--muted)}
+.hist-item .acts{display:flex;gap:6px;flex-wrap:wrap}
+.hist-item .acts button{border:1px solid var(--line);background:var(--card-2);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:700}
+.hist-item .acts button.del{color:var(--coral)}
+.empty{text-align:center;color:var(--muted);padding:30px 10px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cmp-col{background:var(--card-2);border-radius:16px;padding:14px;border:1px solid var(--line)}
+.cmp-col h4{margin:0 0 2px;font-size:15px}
+.cmp-col ol{margin:8px 0 0;padding-left:20px;font-size:14px}
+.cmp-col li{margin:3px 0}
+.cmp-col li.common{color:var(--mint);font-weight:800}
+.hbar{display:flex;align-items:center;gap:6px;font-size:12px;margin:3px 0}
+.hbar span{width:44px;color:var(--text-2);font-weight:700}
+.hbar div{flex:1;height:7px;background:var(--line);border-radius:9px;overflow:hidden}
+.hbar i{display:block;height:100%;background:var(--brand)}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;z-index:60;background:rgba(10,12,35,.5);display:none;align-items:flex-end;justify-content:center;padding:0;backdrop-filter:blur(3px)}
+.modal-bg.open{display:flex;animation:bgIn .2s}
+@keyframes bgIn{from{opacity:0}}
+.modal{width:100%;max-width:560px;max-height:88vh;overflow:auto;background:var(--card);border-radius:24px 24px 0 0;padding:24px 22px 28px;animation:sheet .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes sheet{from{transform:translateY(40px);opacity:.4}}
+@media (min-width:640px){.modal-bg{align-items:center;padding:20px}.modal{border-radius:24px}}
+.modal .close{float:right;width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--card-2);font-size:18px}
+.modal h3{margin:4px 0 4px;font-size:22px;font-weight:900}
+.modal p{color:var(--text-2)}
+
+.toast{position:fixed;left:50%;bottom:24px;z-index:80;transform:translate(-50%,20px);background:var(--text);color:var(--bg);font-weight:700;font-size:14px;padding:12px 18px;border-radius:14px;opacity:0;pointer-events:none;transition:all .25s;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+footer.wrap{margin:36px auto 26px;}footer{text-align:center;color:var(--muted);font-size:12.5px;line-height:1.8}
+footer b{color:var(--text-2)}
+footer a{color:inherit}
+
+.screen{display:none}
+.screen.active{display:block;animation:fadeUp .4s ease both}
+
+@media (max-width:720px){
+  .feat{grid-template-columns:1fr}
+  .majors{grid-template-columns:1fr}
+  .jobs{grid-template-columns:1fr 1fr}
+  .stepbar .st span.t{display:none}
+  .stepbar .st{justify-content:center;flex:1}
+  .stepbar .st.on span.t{display:inline}
+  .stepbar .st.on{flex:2.4}
+  .hero{padding:24px 20px 28px}
+  .hero .bfly{font-size:40px;right:18px;top:18px}
+  .card{padding:18px}
+  .icon-btn .tx{display:none}
+}
+@media (max-width:420px){
+  .jobs{grid-template-columns:1fr}
+  .riasec{gap:5px}
+  .rb .bar{height:70px}
+  .compare{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+@media print{.topbar,.btn-row,footer,.no-print{display:none!important}body{background:#fff}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <button class="logo" id="goHome" aria-label="꿈끼나비 홈으로"><span aria-hidden="true">🦋</span>꿈끼나비 <small>SchoolKit</small></button>
+    <div class="top-actions">
+      <button class="icon-btn" id="btnHistory" aria-label="진단 기록 보기"><span aria-hidden="true">🗂️</span><span class="tx">기록</span></button>
+      <button class="icon-btn" id="btnTheme" aria-label="다크 모드 전환"><span aria-hidden="true" id="themeIcon">🌙</span><span class="tx" id="themeText">다크</span></button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+
+<!-- ① HOME -->
+<section class="screen" id="screen-home" aria-labelledby="homeTitle">
+  <div class="hero">
+    <span class="bfly" aria-hidden="true">🦋</span>
+    <span class="sk-pill">SchoolKit</span>
+    <h1 id="homeTitle">꿈끼나비</h1>
+    <p>나의 흥미와 성격으로 찾는 맞춤형 학과 &amp; 직업.<br>좋아하는 것을 고르면, 어울리는 길을 함께 찾아 날아가요.</p>
+  </div>
+
+  <div class="card section">
+    <div class="stepbar" aria-hidden="true">
+      <div class="st"><span class="n">1</span><span class="t">흥미 고르기</span></div>
+      <div class="st"><span class="n">2</span><span class="t">성향 체크</span></div>
+      <div class="st"><span class="n">3</span><span class="t">활동 입력</span></div>
+      <div class="st last on"><span class="n">4</span><span class="t">학과·직업 추천</span></div>
+    </div>
+    <p class="sec-sub" style="margin:14px 0 14px">3단계 질문에 답하면 약 3분 만에 결과를 볼 수 있어요. 정답은 없으니 마음 가는 대로 골라 주세요.</p>
+    <button class="btn btn-primary btn-big" id="btnStart">진로 진단 시작하기 <span aria-hidden="true">→</span></button>
+    <div id="resumeBox" style="text-align:center;margin-top:10px"></div>
+  </div>
+
+  <div class="section" id="recentBox"></div>
+
+  <div class="feat section">
+    <div class="f"><span class="em" aria-hidden="true">🧭</span><b>흥미·성격·활동을 한 번에</b><p>세 가지 정보를 묶어 홀랜드(RIASEC) 성향과 관심 분야를 함께 분석해요.</p></div>
+    <div class="f"><span class="em" aria-hidden="true">🎓</span><b>43개 학과 · 120여 개 직업</b><p>적합도, 추천 이유, 관련 교과, 핵심 역량, 진로 전망까지 한눈에.</p></div>
+    <div class="f"><span class="em" aria-hidden="true">🔒</span><b>로그인 없이, 내 기기에만</b><p>이름·학번을 받지 않고, 결과는 이 브라우저에만 저장돼요.</p></div>
+  </div>
+</section>
+
+<!-- ② QUIZ -->
+<section class="screen" id="screen-quiz" aria-label="진로 진단">
+  <div class="card section" style="margin-top:18px">
+    <div class="stepbar" id="quizStepbar">
+      <div class="st" data-s="1"><span class="n">1</span><span class="t">흥미 고르기</span></div>
+      <div class="st" data-s="2"><span class="n">2</span><span class="t">성향 체크</span></div>
+      <div class="st" data-s="3"><span class="n">3</span><span class="t">활동 입력</span></div>
+      <div class="st last" data-s="4"><span class="n">4</span><span class="t">학과·직업 추천</span></div>
+    </div>
+    <div class="progress" aria-hidden="true"><i id="progBar"></i></div>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="card section step-panel" id="step1">
+    <h2 class="sec-title">Step 1. 어떤 분야에 마음이 끌리나요?</h2>
+    <p class="sec-sub">관심 있는 분야를 모두 골라 주세요. 3개 이상 고르면 더 정확해져요.</p>
+    <div class="group-label"><b>관심 분야</b><span class="cnt" id="cntInterests"></span></div>
+    <div class="chips" id="chipsInterests" role="group" aria-label="관심 분야 선택"></div>
+    <div class="group-label"><label for="customInterest"><b>목록에 없는 관심사가 있나요? (선택)</b></label></div>
+    <input class="field" id="customInterest" type="text" placeholder="예: 로봇, 별자리, 웹툰, 축구 데이터 (쉼표로 구분)" autocomplete="off">
+    <div class="kw-preview" id="kwPrev1" aria-live="polite"></div>
+    <div class="hint" id="hint1" role="alert"></div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" data-nav="home">← 처음으로</button>
+      <button class="btn btn-primary" data-nav="2">다음 단계 →</button>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="card section step-panel" id="step2">
+    <h2 class="sec-title">Step 2. 나는 어떤 사람일까요?</h2>
+    <p class="sec-sub">평소의 나와 더 가까운 쪽으로 점을 옮겨 주세요. 가운데는 "반반"이에요.</p>
+    <div id="sliders"></div>
+    <div class="group-label"><b>나를 잘 설명하는 말</b><span class="cnt" id="cntTraits"></span></div>
+    <div class="chips" id="chipsTraits" role="group" aria-label="성격 특성 선택"></div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" data-nav="1">← 이전</button>
+      <button class="btn btn-primary" data-nav="3">다음 단계 →</button>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="card section step-panel" id="step3">
+    <h2 class="sec-title">Step 3. 무엇을 할 때 즐거운가요?</h2>
+    <p class="sec-sub">평소 즐겨 하는 활동과 좋아하거나 잘하는 과목을 골라 주세요.</p>
+    <div class="group-label"><b>좋아하는 활동</b><span class="cnt" id="cntActivities"></span></div>
+    <div class="chips" id="chipsActivities" role="group" aria-label="좋아하는 활동 선택"></div>
+    <div class="group-label"><b>좋아하거나 잘하는 과목</b><span class="cnt" id="cntSubjects"></span></div>
+    <div class="chips" id="chipsSubjects" role="group" aria-label="좋아하는 과목 선택"></div>
+    <div class="group-label"><label for="hobbyText"><b>취미·동아리·자랑하고 싶은 경험 (선택)</b></label></div>
+    <textarea class="field" id="hobbyText" placeholder="예: 과학 동아리에서 화산 모형을 만들었어요. 주말엔 유튜브 영상을 편집해요."></textarea>
+    <div class="kw-preview" id="kwPrev3" aria-live="polite"></div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" data-nav="2">← 이전</button>
+      <button class="btn btn-mint" data-nav="analyze">결과 분석하기 ✨</button>
+    </div>
+  </div>
+</section>
+
+<!-- LOADING -->
+<section class="screen" id="screen-loading" aria-live="polite">
+  <div class="loading">
+    <div>
+      <div class="fly-stage" aria-hidden="true">
+        <svg class="trail" viewBox="0 0 240 140"><path d="M10 90 C 60 20, 110 120, 150 70 S 220 40, 230 70" fill="none" stroke="var(--line)" stroke-width="3" stroke-dasharray="4 8" stroke-linecap="round"/></svg>
+        <div class="fly">
+          <svg viewBox="0 0 56 56">
+            <g class="wing">
+              <path d="M28 30 C 14 6, 0 14, 6 26 C 0 36, 14 44, 28 32Z" fill="var(--brand)"/>
+              <path d="M28 30 C 42 6, 56 14, 50 26 C 56 36, 42 44, 28 32Z" fill="var(--brand-3)"/>
+              <circle cx="14" cy="21" r="3" fill="#fff" opacity=".7"/><circle cx="42" cy="21" r="3" fill="#fff" opacity=".7"/>
+            </g>
+            <rect x="26.5" y="18" width="3" height="22" rx="1.5" fill="var(--text)"/>
+          </svg>
+        </div>
+      </div>
+      <p class="load-msg" id="loadMsg">흥미 키워드를 모으는 중…</p>
+      <p class="load-sub">나비가 43개 학과를 날아다니며 어울리는 곳을 찾고 있어요</p>
+    </div>
+  </div>
+</section>
+
+<!-- ③ RESULT -->
+<section class="screen" id="screen-result" aria-labelledby="resTitle">
+  <div id="resultCapture" style="padding-top:18px">
+    <div class="card sum-card fade-in" id="sumCard"></div>
+
+    <div class="section">
+      <h2 class="sec-title fade-in" id="resTitle" style="margin-top:22px">🎓 나와 잘 어울리는 학과</h2>
+      <p class="sec-sub fade-in">적합도는 내가 고른 흥미·성향·활동이 학과의 특성과 얼마나 겹치는지를 나타내요.</p>
+      <div class="majors" id="majorList"></div>
+    </div>
+
+    <div class="section">
+      <h2 class="sec-title fade-in" style="margin-top:22px">💼 연결되는 직업</h2>
+      <p class="sec-sub fade-in">카드를 누르면 하는 일과 관련 학과를 볼 수 있어요.</p>
+      <div class="jobs" id="jobList"></div>
+    </div>
+
+    <div class="section no-print">
+      <h2 class="sec-title fade-in" style="margin-top:22px">🔍 함께 살펴볼 만한 학과</h2>
+      <div class="more-list" id="moreList"></div>
+    </div>
+
+    <p class="note section fade-in">이 결과는 진로 탐색을 시작하기 위한 <b>참고 자료</b>예요. 흥미는 경험에 따라 계속 바뀌니, 학기마다 다시 해 보고 결과가 어떻게 달라지는지 비교해 보세요. 더 깊이 알아보고 싶다면 <a href="https://www.career.go.kr" target="_blank" rel="noopener">커리어넷</a>의 진로심리검사와 학과·직업 정보를 함께 활용해요.</p>
+  </div>
+
+  <div class="btn-row section">
+    <button class="btn btn-ghost" id="btnRetry">↺ 다시 하기</button>
+    <button class="btn btn-ghost" id="btnSaveImg">⬇ 결과 저장하기</button>
+    <button class="btn btn-primary" id="btnShare">↗ 결과 공유하기</button>
+  </div>
+  <div style="text-align:center;margin-top:8px"><button class="linkish" id="btnEdit">입력 내용 고쳐서 다시 보기</button></div>
+</section>
+
+<!-- HISTORY -->
+<section class="screen" id="screen-history" aria-labelledby="histTitle">
+  <div class="card section" style="margin-top:18px">
+    <h2 class="sec-title" id="histTitle">🗂️ 나의 진단 기록</h2>
+    <p class="sec-sub">진단 결과는 이 브라우저에 자동 저장돼요(최근 20개). 두 개를 골라 비교하면 내 관심이 어떻게 변했는지 볼 수 있어요.</p>
+    <div id="histList"></div>
+    <div class="btn-row" style="margin-top:6px">
+      <button class="btn btn-primary" id="btnCompare" disabled>선택한 2개 비교하기</button>
+      <button class="btn btn-ghost" id="btnClearAll">기록 모두 지우기</button>
+    </div>
+  </div>
+  <div class="card section" id="compareBox" hidden></div>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <b>SchoolKit · 학교에서 바로 쓰는 수업 도구</b><br>
+  문의 <a href="mailto:snackscience@naver.com">snackscience@naver.com</a><br>
+  꿈끼나비 v1.0 · ⓒ snackscience. All rights reserved.
+</footer>
+
+<div class="modal-bg" id="modalBg" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" id="modal"></div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================================
+   꿈끼나비 · SchoolKit — 진로·학과 매칭 내비게이터
+   ========================================================= */
+
+/* ---------- 1. 성향 태그 사전 (h = 홀랜드 RIASEC 유형) ---------- */
+const TAGS = {
+  sci:{l:'과학 탐구',h:'I'}, bio:{l:'생명·자연',h:'I'}, space:{l:'지구·우주',h:'I'}, env:{l:'환경·생태',h:'I'},
+  math:{l:'수리·논리',h:'I'}, it:{l:'IT·컴퓨터',h:'I'}, data:{l:'데이터 분석',h:'C'},
+  eng:{l:'공학·기술',h:'R'}, make:{l:'만들기·손재주',h:'R'}, sport:{l:'운동·신체활동',h:'R'}, nature:{l:'야외·현장 활동',h:'R'}, food:{l:'요리·식품',h:'R'},
+  art:{l:'미술·디자인',h:'A'}, music:{l:'음악·공연',h:'A'}, media:{l:'미디어·영상',h:'A'}, write:{l:'글쓰기·언어',h:'A'}, create:{l:'창의·아이디어',h:'A'}, game:{l:'게임·콘텐츠',h:'A'}, human:{l:'인문·역사',h:'A'},
+  care:{l:'돌봄·공감',h:'S'}, edu:{l:'가르치기',h:'S'}, people:{l:'사람·소통',h:'S'}, med:{l:'의료·건강',h:'S'}, society:{l:'사회 문제',h:'S'},
+  lead:{l:'리더십·기획',h:'E'}, biz:{l:'경영·창업',h:'E'}, speak:{l:'발표·설득',h:'E'}, law:{l:'법·정책',h:'E'}, global:{l:'외국어·국제',h:'E'},
+  detail:{l:'꼼꼼함·정확성',h:'C'}, plan:{l:'계획·체계',h:'C'}, econ:{l:'경제·금융',h:'C'}
+};
+const RIASEC = {
+  R:{n:'현실형',e:'🛠️',adj:'손으로 해내는',noun:'실천가',d:'직접 몸을 움직이고 도구와 기계를 다루며 눈에 보이는 결과를 만들 때 힘이 나요.'},
+  I:{n:'탐구형',e:'🔬',adj:'끝까지 파고드는',noun:'탐구자',d:'"왜 그럴까?"를 끝까지 따라가며 원리를 밝혀내는 데서 즐거움을 느껴요.'},
+  A:{n:'예술형',e:'🎨',adj:'상상력 넘치는',noun:'창작가',d:'정해진 틀보다 나만의 방식으로 표현하고 새로운 것을 만들어 내는 걸 좋아해요.'},
+  S:{n:'사회형',e:'🤝',adj:'마음을 잇는',noun:'조력자',d:'사람들과 어울리고, 누군가를 돕거나 가르칠 때 보람을 크게 느껴요.'},
+  E:{n:'진취형',e:'🚀',adj:'앞장서는',noun:'리더',d:'목표를 세우고 사람들을 이끌며 일을 성사시키는 과정에서 에너지를 얻어요.'},
+  C:{n:'관습형',e:'📐',adj:'꼼꼼한',noun:'설계자',d:'계획을 세우고 정보를 정확하게 정리하며 차근차근 완성해 가는 데 강해요.'}
+};
+
+/* ---------- 2. 입력 선택지 ---------- */
+const INTERESTS = [
+  {l:'과학 실험·탐구',e:'🔬',t:{sci:3,math:1}}, {l:'IT·코딩',e:'💻',t:{it:3,math:1,data:1}},
+  {l:'수학·논리',e:'➗',t:{math:3,data:1}}, {l:'우주·지구·날씨',e:'🌏',t:{space:3,sci:1,nature:1}},
+  {l:'생명·동물·식물',e:'🌱',t:{bio:3,sci:1}}, {l:'환경·기후',e:'♻️',t:{env:3,society:1}},
+  {l:'의료·건강',e:'🩺',t:{med:3,bio:1,care:1}}, {l:'기계·로봇·자동차',e:'🤖',t:{eng:3,make:1}},
+  {l:'건축·공간',e:'🏠',t:{eng:2,art:1,make:1}}, {l:'미술·디자인',e:'🎨',t:{art:3,create:1}},
+  {l:'패션·뷰티',e:'👗',t:{art:2,create:1,biz:1}}, {l:'음악·공연',e:'🎵',t:{music:3}},
+  {l:'영상·미디어',e:'🎬',t:{media:3,create:1}}, {l:'게임·웹툰',e:'🎮',t:{game:3,art:1,it:1}},
+  {l:'문학·글쓰기',e:'📚',t:{write:3,human:1}}, {l:'역사·철학',e:'🏛️',t:{human:3}},
+  {l:'외국어·국제',e:'🌐',t:{global:3}}, {l:'여행·문화',e:'✈️',t:{global:2,people:1}},
+  {l:'사회 문제·정치',e:'🗞️',t:{society:3,law:1}}, {l:'법·정의',e:'⚖️',t:{law:3,society:1}},
+  {l:'경영·창업',e:'💼',t:{biz:3,lead:1}}, {l:'경제·돈 관리',e:'📈',t:{econ:3,math:1}},
+  {l:'심리·상담',e:'💬',t:{care:3,people:1}}, {l:'교육·가르치기',e:'🍎',t:{edu:3,people:1}},
+  {l:'스포츠',e:'⚽',t:{sport:3}}, {l:'요리·식품',e:'🍳',t:{food:3}}
+];
+const SLIDERS = [
+  {id:'s1',L:'혼자 깊이 몰입',R:'여럿이 함께 어울림',lr:{I:1,R:1},rr:{S:1,E:1},lt:{},rt:{people:1}},
+  {id:'s2',L:'논리·분석적',R:'감성·상상력',lr:{I:1,C:1},rr:{A:2},lt:{math:1,data:1},rt:{create:1}},
+  {id:'s3',L:'계획대로 차근차근',R:'즉흥적·도전적',lr:{C:2},rr:{E:1,A:1},lt:{plan:1,detail:1},rt:{}},
+  {id:'s4',L:'직접 손으로 해 보기',R:'머리로 생각하기',lr:{R:2},rr:{I:1},lt:{make:1},rt:{}},
+  {id:'s5',L:'앞에서 이끌기',R:'옆에서 돕기',lr:{E:2},rr:{S:1,C:1},lt:{lead:1},rt:{care:1}}
+];
+const TRAITS = [
+  {l:'꼼꼼해요',t:{detail:2}}, {l:'창의적이에요',t:{create:2}}, {l:'리더십이 있어요',t:{lead:2}},
+  {l:'끈기가 있어요',t:{plan:1,sci:1}}, {l:'공감을 잘해요',t:{care:2,people:1}}, {l:'호기심이 많아요',t:{sci:1,create:1}},
+  {l:'논리적이에요',t:{math:1,data:1}}, {l:'표현력이 좋아요',t:{speak:1,media:1}}, {l:'책임감이 강해요',t:{plan:1,care:1}},
+  {l:'도전을 즐겨요',t:{biz:1,lead:1}}, {l:'차분해요',t:{detail:1,data:1}}, {l:'손재주가 있어요',t:{make:2}},
+  {l:'친화력이 좋아요',t:{people:2}}, {l:'정의감이 강해요',t:{law:1,society:1}}, {l:'관찰력이 좋아요',t:{sci:1,nature:1}}
+];
+const ACTIVITIES = [
+  {l:'만들기·조립',e:'🔧',t:{make:2,eng:1}}, {l:'실험·관찰',e:'🧪',t:{sci:2}}, {l:'그림·디자인',e:'✏️',t:{art:2}},
+  {l:'글쓰기·블로그',e:'📝',t:{write:2}}, {l:'토론·발표',e:'🎤',t:{speak:2,society:1}}, {l:'계산·문제 풀이',e:'🧮',t:{math:2}},
+  {l:'코딩·앱 만들기',e:'👩‍💻',t:{it:2}}, {l:'친구 고민 들어주기',e:'🫶',t:{care:2}}, {l:'친구·동생 가르치기',e:'🧑‍🏫',t:{edu:2}},
+  {l:'운동·체육 활동',e:'🏃',t:{sport:2}}, {l:'악기·노래·춤',e:'🎸',t:{music:2}}, {l:'영상 찍고 편집',e:'📹',t:{media:2}},
+  {l:'책 읽기',e:'📖',t:{human:1,write:1}}, {l:'게임하기',e:'🕹️',t:{game:2}}, {l:'요리·베이킹',e:'🧁',t:{food:2,make:1}},
+  {l:'봉사활동',e:'🙌',t:{care:1,society:1}}, {l:'행사 기획·운영',e:'📋',t:{lead:1,plan:1}}, {l:'자연 탐험·캠핑',e:'🏕️',t:{nature:2,env:1}},
+  {l:'물건 팔기·용돈 관리',e:'💰',t:{biz:1,econ:1}}, {l:'외국어·해외 콘텐츠',e:'🗺️',t:{global:2}}, {l:'반려동물 돌보기',e:'🐶',t:{bio:1,care:1}},
+  {l:'정리·기록하기',e:'🗂️',t:{detail:1,plan:1}}
+];
+const SUBJECTS = [
+  {l:'국어',t:{write:1,human:1}}, {l:'영어',t:{global:2}}, {l:'수학',t:{math:2}}, {l:'과학',t:{sci:2}},
+  {l:'사회',t:{society:2}}, {l:'역사',t:{human:2}}, {l:'도덕',t:{human:1,care:1}}, {l:'기술·가정',t:{make:1,eng:1}},
+  {l:'정보',t:{it:2}}, {l:'미술',t:{art:2}}, {l:'음악',t:{music:2}}, {l:'체육',t:{sport:2}}
+];
+/* 자유 입력 키워드 사전 */
+const KW = [
+  [['코딩','프로그래밍','파이썬','앱 개발','컴퓨터','소프트웨어','해킹','보안','웹사이트','스크래치','엔트리'],{it:2},'IT·컴퓨터'],
+  [['ai','인공지능','머신러닝','챗봇','챗gpt'],{it:2,data:1},'IT·컴퓨터'],
+  [['데이터','통계','그래프','분석'],{data:2,math:1},'데이터 분석'],
+  [['수학','계산','퍼즐','암호','스도쿠','큐브'],{math:2},'수리·논리'],
+  [['과학','실험','발명','연구','화학','물리','원소','현미경'],{sci:2},'과학 탐구'],
+  [['생물','생명','유전','세포','곤충','공룡'],{bio:2,sci:1},'생명·자연'],
+  [['동물','강아지','고양이','반려','물고기','파충류'],{bio:2,care:1},'생명·자연'],
+  [['식물','꽃','나무','농사','텃밭','숲'],{bio:1,nature:2},'야외·현장 활동'],
+  [['우주','별자리','천체','행성','로켓','화산','지진','날씨','기상','암석','광물','지구','태풍','천문'],{space:2,sci:1},'지구·우주'],
+  [['환경','기후','재활용','쓰레기','탄소','멸종','플라스틱'],{env:2},'환경·생태'],
+  [['로봇','기계','자동차','비행기','드론','레고','조립','전기','전자','아두이노'],{eng:2,make:1},'공학·기술'],
+  [['건축','인테리어','도시','공간'],{eng:1,art:1,make:1},'공학·기술'],
+  [['그림','미술','드로잉','디자인','캐릭터','일러스트','만들기'],{art:2,create:1},'미술·디자인'],
+  [['웹툰','만화','애니'],{art:2,game:1},'미술·디자인'],
+  [['게임','e스포츠','마인크래프트','로블록스'],{game:2},'게임·콘텐츠'],
+  [['노래','음악','피아노','기타','작곡','악기','밴드','랩','바이올린','합창'],{music:2},'음악·공연'],
+  [['춤','댄스','연기','뮤지컬','연극','공연','배우','아이돌'],{music:1,media:1,speak:1},'음악·공연'],
+  [['유튜브','영상','편집','사진','방송','촬영','영화','드라마'],{media:2,create:1},'미디어·영상'],
+  [['소설','글쓰기','작가','일기','블로그','독서','책','시 쓰기'],{write:2},'글쓰기·언어'],
+  [['역사','철학','고전','박물관','유적'],{human:2},'인문·역사'],
+  [['영어','일본어','중국어','외국어','해외','외국','여행','언어'],{global:2},'외국어·국제'],
+  [['토론','발표','연설','설득','회장','반장','리더'],{speak:1,lead:1},'발표·설득'],
+  [['법학','법률','변호사','판사','검사','경찰','정의','인권'],{law:2,society:1},'법·정책'],
+  [['정치','뉴스','사회 문제','봉사','기부','선거'],{society:2},'사회 문제'],
+  [['돈','주식','경제','투자','용돈','금융','은행'],{econ:2},'경제·금융'],
+  [['창업','사업','장사','마케팅','판매','브랜드','광고'],{biz:2},'경영·창업'],
+  [['병원','의사','간호','약사','건강','치료','응급','의학'],{med:2,care:1},'의료·건강'],
+  [['상담','심리','고민','마음'],{care:2,people:1},'돌봄·공감'],
+  [['선생님','가르치','교사','멘토','어린이','유치원','동생'],{edu:2,care:1},'가르치기'],
+  [['축구','농구','야구','배구','수영','운동','태권도','달리기','헬스','배드민턴','스포츠','줄넘기'],{sport:2},'운동·신체활동'],
+  [['요리','베이킹','빵','과자','음식','카페','디저트'],{food:2,make:1},'요리·식품'],
+  [['패션','옷','화장','메이크업','뷰티','스타일'],{art:1,create:1,biz:1},'미술·디자인'],
+  [['캠핑','등산','탐험','낚시','야외','답사'],{nature:2},'야외·현장 활동'],
+  [['정리','기록','계획','다이어리'],{plan:1,detail:1},'계획·체계']
+];
+
+/* ---------- 3. 학과·직업 데이터 ---------- */
+const MAJORS = [
+ {id:'cs',n:'컴퓨터공학과',f:'공학',c:'IR',t:{it:3,math:2,eng:1,data:1},sub:['수학','정보','물리학'],sk:['논리적 사고','문제 해결력','프로그래밍'],o:'모든 산업이 소프트웨어로 움직이면서 꾸준히 인재 수요가 높은 분야예요.',
+  j:[['소프트웨어 개발자','💻','앱·웹·시스템 등 사람들이 쓰는 프로그램을 설계하고 만들어요.'],['정보보안 전문가','🛡️','해킹과 개인정보 유출을 막기 위해 시스템의 약점을 찾고 지켜요.'],['게임 프로그래머','🕹️','게임의 규칙, 물리 효과, 캐릭터 움직임을 코드로 구현해요.']]},
+ {id:'ai',n:'인공지능학과',f:'공학',c:'IC',t:{it:3,data:3,math:2,create:1},sub:['수학','정보','인공지능 기초'],sk:['데이터 해석력','수학적 모델링','AI 윤리 감수성'],o:'AI가 교육·의료·제조 등으로 빠르게 퍼지며 새로 생기는 일자리가 많은 분야예요.',
+  j:[['AI 엔지니어','🤖','데이터를 학습시켜 스스로 판단하는 인공지능 모델을 만들어요.'],['데이터 과학자','📊','방대한 데이터에서 의미 있는 패턴을 찾아 문제 해결에 활용해요.'],['AI 윤리 전문가','⚖️','AI가 공정하고 안전하게 쓰이도록 기준을 세우고 점검해요.']]},
+ {id:'stat',n:'통계·데이터사이언스학과',f:'자연',c:'CI',t:{data:3,math:3,econ:1,it:1},sub:['수학','확률과 통계','정보'],sk:['수리적 사고','데이터 시각화','근거 기반 판단'],o:'데이터로 의사결정을 하는 기업·공공기관이 늘며 활용 범위가 넓어지고 있어요.',
+  j:[['데이터 분석가','📈','숫자 속 흐름을 읽어 기업과 기관이 더 나은 결정을 하도록 도와요.'],['통계 전문가','🧮','조사를 설계하고 결과를 분석해 정확한 통계를 만들어요.'],['스포츠 데이터 분석가','🏟️','선수 기록과 경기 데이터를 분석해 전략을 세우는 데 도움을 줘요.']]},
+ {id:'math',n:'수학과',f:'자연',c:'IC',t:{math:3,data:1,detail:1},sub:['수학','미적분','기하'],sk:['추상적 사고','증명과 논증','끈기'],o:'수학적 사고력은 금융·암호·AI 등 다양한 분야의 기초가 되어 진로 폭이 넓어요.',
+  j:[['보험계리사','📑','통계와 확률로 위험을 계산해 보험 상품의 보험료를 정해요.'],['암호 연구원','🔐','안전한 통신을 위한 암호 체계를 수학으로 설계해요.'],['수학 교사','🍎','학생들이 수학의 원리를 이해하고 즐길 수 있도록 가르쳐요.']]},
+ {id:'phys',n:'물리학과',f:'자연',c:'IR',t:{sci:3,math:2,space:1,eng:1},sub:['물리학','수학','역학과 에너지'],sk:['원리 탐구력','실험 설계','수리 모델링'],o:'반도체·에너지·양자기술 등 첨단 산업의 기초 학문으로 연구 인력이 꾸준히 필요해요.',
+  j:[['물리학 연구원','🔭','자연 현상의 근본 원리를 실험과 이론으로 밝혀요.'],['반도체 공정 엔지니어','💾','전자 기기의 핵심인 반도체 칩을 만드는 공정을 개발하고 관리해요.'],['광학 엔지니어','🔦','렌즈·레이저·카메라 등 빛을 다루는 장치를 설계해요.']]},
+ {id:'chem',n:'화학과',f:'자연',c:'IR',t:{sci:3,detail:1,make:1},sub:['화학','물질과 에너지','수학'],sk:['정밀한 실험 능력','관찰력','안전 의식'],o:'신소재, 배터리, 화장품, 의약품 등 생활 곳곳에 연결된 산업에서 일할 수 있어요.',
+  j:[['화학 연구원','⚗️','새로운 물질을 합성하고 성질을 분석해 쓸모를 찾아요.'],['화장품 연구원','🧴','피부에 안전하고 효과적인 화장품 성분과 제형을 개발해요.'],['배터리 소재 연구원','🔋','전기차·휴대폰 배터리의 성능을 높이는 소재를 연구해요.']]},
+ {id:'bio',n:'생명과학과',f:'자연',c:'IR',t:{bio:3,sci:2,med:1},sub:['생명과학','화학','세포와 물질대사'],sk:['관찰·실험력','생명 윤리 의식','자료 해석'],o:'바이오 헬스와 유전체 기술이 발전하며 연구·산업 분야 모두 성장하고 있어요.',
+  j:[['생명공학 연구원','🧬','유전자·세포를 연구해 질병 치료나 식량 문제 해결 방법을 찾아요.'],['유전체 분석가','🔎','DNA 정보를 분석해 질병 위험이나 생물의 특징을 밝혀요.'],['바이오 의약품 연구원','💉','생물에서 얻은 물질로 백신과 치료제를 개발해요.']]},
+ {id:'earth',n:'지구환경과학·천문우주학과',f:'자연',c:'IR',t:{space:3,sci:2,nature:2,data:1},sub:['지구과학','물리학','행성우주과학'],sk:['현장 관찰력','데이터 분석','장기적 탐구심'],o:'기후 위기, 자연재해 대비, 우주 탐사가 중요해지며 역할이 커지고 있어요.',
+  j:[['기상 연구원','🌦️','날씨와 기후 자료를 분석해 예보 정확도를 높이고 기후 변화를 연구해요.'],['천문학자','🌌','망원경과 관측 자료로 별·은하·우주의 기원을 연구해요.'],['지질학자','🪨','암석과 지층을 조사해 지구의 역사와 지진·화산 위험을 밝혀요.']]},
+ {id:'envE',n:'환경공학과',f:'공학',c:'RI',t:{env:3,eng:1,sci:1,society:1},sub:['화학','생명과학','기후변화와 환경생태'],sk:['문제 해결력','현장 분석','지속가능성 감각'],o:'탄소중립과 ESG 경영이 강조되며 기업과 공공기관 모두 환경 전문가를 찾고 있어요.',
+  j:[['환경 컨설턴트','🌿','기업과 지역이 환경 규제를 지키고 오염을 줄이도록 해결책을 제안해요.'],['기후변화 전문가','🌡️','온실가스를 측정하고 기후 위기에 대응하는 정책과 기술을 연구해요.'],['수질·대기 환경기술자','💧','물과 공기의 오염도를 측정하고 정화 시설을 설계해요.']]},
+ {id:'mech',n:'기계공학과',f:'공학',c:'RI',t:{eng:3,make:2,math:1},sub:['물리학','수학','역학과 에너지'],sk:['공간 지각력','설계 능력','실행력'],o:'자동차·로봇·에너지 설비 등 제조업 전반의 핵심 학과로 활동 무대가 넓어요.',
+  j:[['기계 설계 엔지니어','⚙️','기계와 부품을 컴퓨터로 설계하고 시험해 실제로 만들어요.'],['로봇 공학자','🦾','산업·의료·생활 현장에서 쓰이는 로봇을 설계하고 제어해요.'],['자동차 엔지니어','🚗','전기차·자율주행차의 동력과 안전 장치를 개발해요.']]},
+ {id:'elec',n:'전자·전기공학과',f:'공학',c:'RI',t:{eng:3,it:1,math:1,make:1},sub:['물리학','수학','정보'],sk:['회로 이해력','논리적 사고','꼼꼼함'],o:'반도체·통신·전력 산업의 기반이 되어 취업 수요가 안정적인 분야예요.',
+  j:[['반도체 설계 엔지니어','🔌','칩 속 수많은 회로를 설계해 더 빠르고 효율적인 반도체를 만들어요.'],['통신 엔지니어','📡','휴대폰·인터넷이 끊김 없이 연결되도록 통신망을 설계해요.'],['전기 기술자','⚡','건물과 공장에 전기가 안전하게 공급되도록 설비를 관리해요.']]},
+ {id:'arch',n:'건축학과',f:'공학·예술',c:'AR',t:{eng:2,art:2,make:1,create:1},sub:['수학','물리학','미술'],sk:['공간 디자인 감각','구조 이해','협업 능력'],o:'친환경·스마트 건축, 도시 재생 등으로 건축의 역할이 다양해지고 있어요.',
+  j:[['건축가','🏛️','사람이 살고 일할 공간을 아름답고 안전하게 설계해요.'],['인테리어 디자이너','🛋️','실내 공간의 색, 가구, 조명을 계획해 쓰임새와 분위기를 만들어요.'],['도시계획가','🏙️','도로·공원·주거지를 배치해 살기 좋은 도시를 설계해요.']]},
+ {id:'aero',n:'항공우주공학과',f:'공학',c:'RI',t:{eng:3,space:2,math:1},sub:['물리학','수학','지구과학'],sk:['정밀 설계','시스템적 사고','도전 정신'],o:'민간 우주 산업과 드론·도심항공교통이 성장하며 새로운 기회가 열리고 있어요.',
+  j:[['항공기 설계 엔지니어','✈️','비행기의 날개·엔진·기체를 안전하고 효율적으로 설계해요.'],['인공위성 개발 연구원','🛰️','지구 관측·통신용 위성을 만들고 우주로 보내요.'],['드론 개발자','🚁','배송·촬영·농업에 쓰이는 드론을 설계하고 비행을 제어해요.']]},
+ {id:'med',n:'의예과',f:'의약',c:'IS',t:{med:3,bio:2,sci:1,care:1},sub:['생명과학','화학','수학'],sk:['책임감','과학적 사고','공감과 소통'],o:'고령화로 의료 수요가 커지고 있지만 입학 경쟁이 치열하고 수련 기간이 길어요.',
+  j:[['의사','🩺','환자를 진찰하고 질병을 진단·치료해 건강을 되찾도록 도와요.'],['의학 연구원','🧫','질병의 원인을 밝히고 새로운 치료법을 연구해요.'],['공중보건 전문가','🏥','감염병 예방 등 지역 사회 전체의 건강을 지키는 정책을 만들어요.']]},
+ {id:'nurse',n:'간호학과',f:'의약',c:'SI',t:{med:3,care:3,people:1},sub:['생명과학','화학','보건'],sk:['공감 능력','침착함','책임감'],o:'병원뿐 아니라 학교·기업·지역 보건 분야로 활동 영역이 넓고 수요가 꾸준해요.',
+  j:[['간호사','💉','환자를 가까이에서 돌보고 치료 과정을 관리해요.'],['보건교사','🏫','학교에서 학생들의 건강을 살피고 보건 교육을 해요.'],['임상연구 간호사','📋','신약·치료법 연구에 참여한 환자를 돌보고 자료를 관리해요.']]},
+ {id:'pharm',n:'약학과',f:'의약',c:'IC',t:{med:2,sci:2,detail:2,bio:1},sub:['화학','생명과학','수학'],sk:['정확성','화학적 이해','상담 능력'],o:'신약 개발과 바이오 산업 성장으로 약국 외 제약·연구 분야 진출도 늘고 있어요.',
+  j:[['약사','💊','처방에 맞게 약을 조제하고 올바른 복용법을 안내해요.'],['신약 개발 연구원','🧪','질병을 치료할 새로운 약 성분을 찾고 효과와 안전성을 시험해요.'],['의약품 인허가 전문가','📄','새 약이 출시될 수 있도록 안전성 자료를 정리해 승인을 받아요.']]},
+ {id:'rehab',n:'물리치료·재활학과',f:'의약',c:'SR',t:{med:2,sport:2,care:2,people:1},sub:['생명과학','체육','물리학'],sk:['신체 이해','공감 능력','꾸준함'],o:'고령화와 스포츠 인구 증가로 재활 전문가를 찾는 곳이 많아지고 있어요.',
+  j:[['물리치료사','🦵','운동과 치료 기구로 다친 몸의 기능을 회복시켜요.'],['작업치료사','🧩','일상생활에 필요한 동작을 다시 할 수 있도록 훈련을 도와요.'],['스포츠 재활 트레이너','🏋️','부상당한 선수가 안전하게 경기에 복귀하도록 관리해요.']]},
+ {id:'vet',n:'수의학과',f:'의약',c:'IR',t:{bio:3,med:2,care:1},sub:['생명과학','화학','수학'],sk:['생명 존중','관찰력','침착한 판단'],o:'반려동물 가구 증가와 동물 방역 중요성으로 활동 분야가 넓어지고 있어요.',
+  j:[['수의사','🐾','아픈 동물을 진료하고 예방접종과 수술을 해요.'],['동물 질병 연구원','🔬','가축 전염병과 동물 질병을 연구해 확산을 막아요.'],['반려동물 행동 전문가','🐕','동물의 문제 행동 원인을 찾고 보호자와 함께 교정해요.']]},
+ {id:'vd',n:'시각디자인학과',f:'예체능',c:'A',t:{art:3,create:2,media:1},sub:['미술','정보','국어'],sk:['시각적 감각','아이디어 발상','소통 능력'],o:'온라인 서비스와 브랜드 경쟁이 치열해지며 디자인 역량의 가치가 커지고 있어요.',
+  j:[['그래픽 디자이너','🖌️','포스터·로고·책 표지 등 메시지를 그림과 글자로 전달해요.'],['UX/UI 디자이너','📱','앱과 웹사이트를 사용하기 쉽고 보기 좋게 설계해요.'],['브랜드 디자이너','🏷️','기업과 제품의 개성이 드러나는 이미지를 만들어요.']]},
+ {id:'id',n:'산업디자인학과',f:'예체능',c:'AR',t:{art:2,make:2,create:2,eng:1},sub:['미술','기술·가정','물리학'],sk:['조형 감각','사용자 관찰','시제품 제작'],o:'제품의 기능만큼 디자인이 중요해지며 전자·가구·모빌리티 기업에서 활약해요.',
+  j:[['제품 디자이너','🎧','생활용품과 전자제품의 모양과 사용 방식을 디자인해요.'],['자동차 디자이너','🏎️','자동차의 외관과 실내를 멋지고 편리하게 디자인해요.'],['가구 디자이너','🪑','쓰임새와 아름다움을 갖춘 가구를 구상하고 제작해요.']]},
+ {id:'music',n:'음악·실용음악학과',f:'예체능',c:'A',t:{music:3,create:1,speak:1},sub:['음악','국어','영어'],sk:['음악적 감수성','꾸준한 연습','무대 표현력'],o:'음원·공연·게임·영상 음악 등 음악이 쓰이는 콘텐츠가 다양해지고 있어요.',
+  j:[['작곡가','🎼','노래, 영화·게임 음악 등 새로운 곡을 만들어요.'],['음향 엔지니어','🎚️','녹음·공연 현장에서 소리를 가장 좋게 들리도록 조정해요.'],['음악치료사','🎶','음악 활동으로 사람들의 마음과 몸을 돌보도록 도와요.']]},
+ {id:'film',n:'연극영화학과',f:'예체능',c:'AE',t:{media:3,create:1,speak:1,people:1,music:1},sub:['국어','음악','미술'],sk:['표현력','협업 능력','관찰력'],o:'OTT와 K-콘텐츠의 세계적 인기로 영상 제작 현장이 넓어졌지만 경쟁도 치열해요.',
+  j:[['배우','🎭','작품 속 인물을 연기로 표현해 이야기를 전달해요.'],['영화감독','🎬','작품 전체를 기획하고 배우·스태프를 이끌어 영상을 완성해요.'],['촬영감독','🎥','장면의 구도·빛·움직임을 설계해 화면에 담아요.']]},
+ {id:'mc',n:'미디어커뮤니케이션학과',f:'사회',c:'AE',t:{media:3,write:1,speak:1,society:1,create:1},sub:['국어','사회','정보'],sk:['기획력','글쓰기','미디어 리터러시'],o:'1인 미디어·디지털 광고가 성장하며 콘텐츠 기획 역량을 가진 인재가 필요해요.',
+  j:[['방송 PD','📺','프로그램을 기획하고 촬영·편집을 총괄해 방송을 만들어요.'],['기자','📰','사건을 취재하고 사실을 확인해 뉴스로 전달해요.'],['광고 기획자','💡','사람들의 마음을 움직이는 광고 아이디어와 전략을 세워요.']]},
+ {id:'game',n:'게임·애니메이션학과',f:'예체능',c:'AI',t:{game:3,art:2,it:1,create:2},sub:['미술','정보','국어'],sk:['스토리텔링','디지털 도구 활용','협업'],o:'게임과 웹툰·애니메이션이 세계로 수출되며 창작 인력의 활동 무대가 커졌어요.',
+  j:[['게임 기획자','🎲','게임의 세계관·규칙·레벨을 설계해 재미를 만들어요.'],['애니메이터','🎞️','캐릭터에 움직임과 표정을 불어넣어 살아 있게 만들어요.'],['웹툰 작가','📖','이야기와 그림으로 연재 만화를 창작해요.']]},
+ {id:'kor',n:'국어국문·문예창작학과',f:'인문',c:'A',t:{write:3,human:2,create:1},sub:['국어','문학','역사'],sk:['문장력','깊이 읽기','공감적 상상력'],o:'웹소설·콘텐츠 시장이 커지며 글 쓰는 능력을 살릴 수 있는 길이 다양해요.',
+  j:[['작가','✍️','소설·시나리오·웹소설 등 이야기를 글로 창작해요.'],['출판 편집자','📚','원고를 다듬고 기획해 좋은 책으로 만들어 내요.'],['카피라이터','🗯️','짧고 강렬한 문장으로 광고와 제품의 매력을 전해요.']]},
+ {id:'hist',n:'사학·철학과',f:'인문',c:'AI',t:{human:3,write:1,sci:1},sub:['역사','사회','국어'],sk:['비판적 사고','자료 탐구력','글쓰기'],o:'문화유산·콘텐츠 산업에서 역사 지식과 깊이 있는 사고력을 가진 인재를 찾아요.',
+  j:[['학예사(큐레이터)','🏺','박물관과 미술관의 유물을 연구하고 전시를 기획해요.'],['역사 연구원','📜','옛 기록과 유적을 분석해 과거를 밝혀요.'],['기록물 관리 전문가','🗃️','공공기관의 중요한 기록을 체계적으로 보존·관리해요.']]},
+ {id:'intl',n:'영어영문·국제학부',f:'인문',c:'EA',t:{global:3,write:1,speak:1,people:1},sub:['영어','사회','제2외국어'],sk:['외국어 능력','다문화 이해','소통 능력'],o:'기업의 해외 진출과 국제 교류가 많아지며 언어와 문화를 잇는 사람이 필요해요.',
+  j:[['통번역가','🗣️','서로 다른 언어를 쓰는 사람들의 말과 글을 정확하게 옮겨요.'],['외교관','🌐','다른 나라와 협상하고 해외에 있는 우리 국민을 보호해요.'],['해외 영업 전문가','🤝','우리 제품을 세계 여러 나라에 소개하고 판매해요.']]},
+ {id:'psy',n:'심리학과',f:'사회',c:'SI',t:{care:3,people:1,sci:1,data:1},sub:['생명과학','사회','확률과 통계'],sk:['경청','과학적 분석','공감 능력'],o:'마음 건강에 대한 관심이 커지며 상담뿐 아니라 사용자 연구 등 기업 분야로도 진출해요.',
+  j:[['상담심리사','🫂','고민을 가진 사람의 이야기를 듣고 마음이 회복되도록 도와요.'],['임상심리사','🧠','심리 검사로 마음의 어려움을 평가하고 치료 계획을 세워요.'],['UX 리서처','🔍','사용자의 행동과 마음을 연구해 더 나은 제품을 만드는 데 도움을 줘요.']]},
+ {id:'sw',n:'사회복지학과',f:'사회',c:'S',t:{care:3,society:2,people:1},sub:['사회','도덕','국어'],sk:['공감 능력','문제 해결력','인권 감수성'],o:'돌봄과 복지가 필요한 사람이 늘며 지역 사회와 공공 분야의 수요가 꾸준해요.',
+  j:[['사회복지사','🏡','어려움을 겪는 이웃이 필요한 도움을 받도록 연결하고 지원해요.'],['청소년지도사','🧑‍🤝‍🧑','청소년의 활동과 성장을 돕는 프로그램을 운영해요.'],['복지정책 연구원','📑','더 많은 사람이 혜택을 받도록 복지 제도를 연구하고 제안해요.']]},
+ {id:'edu',n:'교육학·사범계열',f:'교육',c:'S',t:{edu:3,people:2,care:1,speak:1},sub:['국어','사회','희망 교과'],sk:['설명하는 능력','인내심','소통 능력'],o:'학생 수는 줄고 있지만 에듀테크·평생교육 등 가르치는 일의 형태가 다양해지고 있어요.',
+  j:[['교사','🍎','학생들이 배우고 성장하도록 수업하고 상담해요.'],['교육 콘텐츠 개발자','🖥️','교과서·온라인 강의·학습 앱의 내용을 기획해요.'],['에듀테크 기획자','🧑‍💻','기술로 더 즐겁고 효과적인 배움을 만드는 서비스를 기획해요.']]},
+ {id:'ece',n:'유아교육·아동학과',f:'교육',c:'SA',t:{edu:2,care:3,create:1,art:1},sub:['국어','음악','미술'],sk:['따뜻한 공감','창의적 놀이 구성','관찰력'],o:'영유아 교육과 아동 발달 지원의 중요성이 강조되며 전문성이 더 요구되고 있어요.',
+  j:[['유치원 교사','🧸','놀이와 활동으로 어린이들의 배움과 생활을 이끌어요.'],['아동발달 상담사','🌈','아이의 성장 과정을 살피고 보호자에게 도움을 줘요.'],['아동 콘텐츠 기획자','📺','어린이를 위한 책·영상·놀이 콘텐츠를 만들어요.']]},
+ {id:'law',n:'법학·경찰행정학과',f:'사회',c:'EC',t:{law:3,society:1,speak:1,detail:1},sub:['사회','국어','윤리'],sk:['논리적 글쓰기','정의감','분석력'],o:'법률 서비스와 치안 수요는 꾸준하며, 변호사는 졸업 후 법학전문대학원 진학이 필요해요.',
+  j:[['변호사','⚖️','법률 지식으로 사람들의 권리를 지키고 분쟁을 해결해요.'],['경찰관','👮','범죄를 예방하고 수사해 시민의 안전을 지켜요.'],['법무 담당자','🗂️','기업의 계약서를 검토하고 법적 문제를 미리 예방해요.']]},
+ {id:'pol',n:'행정학·정치외교학과',f:'사회',c:'ES',t:{society:3,law:1,lead:1,global:1,speak:1},sub:['사회','역사','영어'],sk:['비판적 사고','토론 능력','공공의식'],o:'공공 정책과 국제 관계를 다루는 인재로 공직·국제기구·연구소 등에 진출해요.',
+  j:[['공무원','🏛️','국가와 지역의 정책을 실행하고 시민에게 필요한 서비스를 제공해요.'],['정책 연구원','📊','사회 문제를 분석해 해결을 위한 정책을 제안해요.'],['국제기구 직원','🇺🇳','UN 등에서 세계 공동의 문제를 해결하는 일을 해요.']]},
+ {id:'biz',n:'경영학과',f:'사회',c:'EC',t:{biz:3,lead:2,econ:1,people:1},sub:['수학','사회','영어'],sk:['리더십','전략적 사고','협상력'],o:'어느 산업에나 필요한 학문이라 진로 선택 폭이 넓고 창업으로도 이어질 수 있어요.',
+  j:[['마케터','📣','소비자를 분석해 제품을 알리고 팔리게 하는 전략을 세워요.'],['경영 컨설턴트','🧭','기업의 문제를 진단하고 더 잘 운영할 방법을 제안해요.'],['창업가','🚀','새로운 아이디어로 회사를 세우고 키워 나가요.']]},
+ {id:'econ',n:'경제·금융학과',f:'사회',c:'CI',t:{econ:3,math:2,data:1,society:1},sub:['수학','경제','확률과 통계'],sk:['수리 분석','경제 흐름 읽기','판단력'],o:'핀테크와 디지털 금융이 확산되며 데이터와 경제를 함께 아는 인재가 필요해요.',
+  j:[['금융 애널리스트','💹','기업과 시장을 분석해 투자 판단에 필요한 정보를 제공해요.'],['은행원','🏦','예금·대출 등 금융 업무로 고객의 돈 관리를 도와요.'],['경제 연구원','📉','물가·고용 등 경제 지표를 분석하고 전망을 내놓아요.']]},
+ {id:'acc',n:'회계·세무학과',f:'사회',c:'C',t:{econ:2,detail:3,math:1,plan:1},sub:['수학','경제','정보'],sk:['정확성','숫자 감각','윤리 의식'],o:'모든 조직에 필요한 전문 분야로, 자격증을 바탕으로 한 안정적인 진로가 많아요.',
+  j:[['공인회계사','🧾','기업의 재무 기록이 정확한지 검토하고 감사해요.'],['세무사','📒','개인과 기업이 세금을 올바르게 신고하도록 도와요.'],['재무 담당자','💼','회사의 돈이 들어오고 나가는 흐름을 계획하고 관리해요.']]},
+ {id:'sport',n:'체육·스포츠과학과',f:'예체능',c:'RS',t:{sport:3,people:1,edu:1},sub:['체육','생명과학','물리학'],sk:['체력과 끈기','팀워크','지도력'],o:'건강 관리와 생활 스포츠 인구가 늘며 지도·관리·데이터 분야로 진로가 넓어지고 있어요.',
+  j:[['체육 교사','🏅','학생들이 즐겁게 운동하고 건강한 습관을 기르도록 가르쳐요.'],['퍼스널 트레이너','💪','개인에게 맞는 운동 계획을 세우고 지도해요.'],['스포츠 마케터','🏟️','경기·구단·선수를 홍보하고 팬과 연결해요.']]},
+ {id:'food',n:'식품영양·조리학과',f:'자연·예체능',c:'RS',t:{food:3,bio:1,make:1,care:1},sub:['생명과학','화학','기술·가정'],sk:['감각과 창의성','위생 의식','꼼꼼함'],o:'건강식·간편식 시장과 K-푸드 인기로 식품 개발과 조리 분야가 성장하고 있어요.',
+  j:[['셰프','👨‍🍳','새로운 요리를 개발하고 주방을 이끌어요.'],['영양사','🥗','학교·병원 등에서 건강한 식단을 계획하고 관리해요.'],['식품 개발 연구원','🍜','맛과 영양을 갖춘 새로운 식품을 연구하고 만들어요.']]},
+ {id:'tour',n:'호텔관광경영학과',f:'사회',c:'ES',t:{global:2,people:2,biz:1,food:1},sub:['영어','사회','제2외국어'],sk:['서비스 마인드','외국어','상황 대처력'],o:'K-컬처 관광객 증가와 함께 관광·호텔·항공 산업의 회복과 성장이 기대돼요.',
+  j:[['관광 기획자','🗺️','여행 상품과 지역 관광 프로그램을 기획해요.'],['호텔리어','🛎️','호텔 손님이 편안하게 머물 수 있도록 서비스를 제공해요.'],['항공 승무원','🛫','비행 중 승객의 안전과 편의를 책임져요.']]},
+ {id:'fash',n:'패션디자인학과',f:'예체능',c:'AE',t:{art:2,create:2,biz:1,make:1},sub:['미술','기술·가정','영어'],sk:['트렌드 감각','표현력','손재주'],o:'K-패션의 해외 진출과 온라인 브랜드 창업이 늘며 활동 무대가 넓어졌어요.',
+  j:[['패션 디자이너','👗','옷과 액세서리를 구상하고 소재를 골라 디자인해요.'],['스타일리스트','👠','사람과 상황에 어울리는 옷과 연출을 제안해요.'],['패션 MD','🛍️','어떤 상품을 만들고 팔지 기획하고 판매를 관리해요.']]},
+ {id:'agri',n:'농생명·산림자원학과',f:'자연',c:'RI',t:{bio:2,nature:3,env:2},sub:['생명과학','지구과학','화학'],sk:['현장 탐구력','생태 감수성','성실함'],o:'스마트팜과 탄소 흡수원으로서 숲의 가치가 주목받으며 새로운 역할이 생기고 있어요.',
+  j:[['스마트팜 전문가','🌾','센서와 데이터로 작물이 자라는 환경을 자동으로 관리해요.'],['산림 연구원','🌲','숲의 생태와 자원을 연구하고 보전 방법을 찾아요.'],['조경 기술자','🌳','공원과 정원을 설계하고 식물을 가꿔 쾌적한 환경을 만들어요.']]},
+ {id:'nurt',n:'특수교육·상담교육과',f:'교육',c:'SA',t:{edu:2,care:3,people:1},sub:['국어','도덕','사회'],sk:['인내심','맞춤형 지도력','공감 능력'],o:'모든 학생을 위한 맞춤 교육이 강조되며 전문성을 갖춘 교사가 필요해요.',
+  j:[['특수교사','🌟','장애가 있는 학생에게 맞춤형 교육과 생활 지도를 해요.'],['진로상담 교사','🧭','학생이 자신을 이해하고 진로를 설계하도록 상담해요.'],['언어재활사','🗨️','말하기·듣기에 어려움이 있는 사람의 의사소통을 도와요.']]},
+ {id:'cs2',n:'소프트웨어융합·미디어공학과',f:'공학',c:'IA',t:{it:2,media:2,create:1,game:1},sub:['정보','수학','미술'],sk:['기술과 감성의 융합','프로토타이핑','협업'],o:'메타버스·인터랙티브 콘텐츠처럼 기술과 예술이 만나는 분야가 커지고 있어요.',
+  j:[['인터랙티브 콘텐츠 개발자','🕶️','VR·AR처럼 사용자가 직접 참여하는 콘텐츠를 만들어요.'],['프론트엔드 개발자','🧑‍💻','웹사이트에서 사람들이 보고 누르는 화면을 코드로 구현해요.'],['영상 VFX 아티스트','✨','컴퓨터 그래픽으로 영화·광고 속 특수효과를 만들어요.']]}
+];
+
+/* ---------- 4. 매칭 로직 ---------- */
+function addTo(vec,t,w){for(const k in t){vec[k]=(vec[k]||0)+t[k]*w}}
+function findKw(text){
+  const hits=[]; if(!text) return hits; const s=text.toLowerCase();
+  KW.forEach(([words,t,label])=>{const w=words.find(x=>s.includes(x.toLowerCase())); if(w) hits.push({word:w,t,label});});
+  return hits;
+}
+function buildProfile(inp){
+  const vec={}, ri={R:0,I:0,A:0,S:0,E:0,C:0};
+  const pick=(list,ids)=>list.filter(x=>ids.includes(x.l));
+  pick(INTERESTS,inp.interests).forEach(x=>addTo(vec,x.t,1.5));
+  pick(TRAITS,inp.traits).forEach(x=>addTo(vec,x.t,1));
+  pick(ACTIVITIES,inp.activities).forEach(x=>addTo(vec,x.t,1.2));
+  pick(SUBJECTS,inp.subjects).forEach(x=>addTo(vec,x.t,.8));
+  findKw(inp.customInterest).forEach(h=>addTo(vec,h.t,1.5));
+  findKw(inp.hobbyText).forEach(h=>addTo(vec,h.t,1));
+  SLIDERS.forEach(s=>{
+    const v=+inp.sliders[s.id]||3, d=v-3, m=Math.abs(d)/2;
+    if(d<0){addTo(ri,s.lr,m*1.6);addTo(vec,s.lt,m)} else if(d>0){addTo(ri,s.rr,m*1.6);addTo(vec,s.rt,m)}
+  });
+  for(const k in vec) ri[TAGS[k].h]+=vec[k];
+  return {vec,ri};
+}
+function cos(a,b){let d=0,na=0,nb=0;const ks=new Set([...Object.keys(a),...Object.keys(b)]);ks.forEach(k=>{const x=a[k]||0,y=b[k]||0;d+=x*y;na+=x*x;nb+=y*y});return na&&nb?d/Math.sqrt(na*nb):0}
+function majorRi(m){const r={};m.c.split('').forEach((ch,i)=>r[ch]=i===0?2:1);return r}
+function analyze(inp){
+  const p=buildProfile(inp);
+  const ranked=MAJORS.map(m=>{
+    const tc=cos(p.vec,m.t), rc=cos(p.ri,majorRi(m));
+    const raw=.72*tc+.28*rc;
+    const contrib=Object.keys(m.t).map(k=>({k,v:(p.vec[k]||0)*m.t[k]})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,3).map(x=>TAGS[x.k].l);
+    return {m,raw,why:contrib};
+  }).sort((a,b)=>b.raw-a.raw);
+  ranked.forEach(r=>{r.pct=Math.max(30,Math.min(97,Math.round(30+r.raw*68)))});
+  const riSorted=Object.entries(p.ri).sort((a,b)=>b[1]-a[1]);
+  const topTags=Object.entries(p.vec).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k])=>TAGS[k].l);
+  return {profile:p,ranked,riSorted,topTags};
+}
+
+/* ---------- 5. 상태·저장 ---------- */
+const LS_DRAFT='kkumkkinabi.draft.v1', LS_HIST='kkumkkinabi.history.v1', LS_THEME='kkumkkinabi.theme';
+const store={
+  get(k,f){try{const v=localStorage.getItem(k);return v?JSON.parse(v):f}catch(e){return f}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}}
+};
+const blankInputs=()=>({interests:[],customInterest:'',sliders:{s1:3,s2:3,s3:3,s4:3,s5:3},traits:[],activities:[],subjects:[],hobbyText:''});
+let state={screen:'home',step:1,inputs:blankInputs(),viewing:null};
+function saveDraft(){store.set(LS_DRAFT,{screen:state.screen==='loading'?'quiz':state.screen,step:state.step,inputs:state.inputs,viewing:state.viewing})}
+const hasInput=i=>i.interests.length||i.traits.length||i.activities.length||i.subjects.length||i.customInterest||i.hobbyText;
+
+/* ---------- 6. 화면 ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function show(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id==='screen-'+name));
+  state.screen=name; saveDraft(); window.scrollTo({top:0,behavior:'smooth'});
+  if(name==='home') renderHome();
+  if(name==='history') renderHistory();
+}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),2200)}
+
+function renderHome(){
+  const hist=store.get(LS_HIST,[]);
+  $('#resumeBox').innerHTML = hasInput(state.inputs)&&!state.viewing ? `<button class="linkish" id="btnResume">작성하던 진단 이어서 하기</button>` : '';
+  const r=hist[0];
+  $('#recentBox').innerHTML = r ? `<div class="card recent"><div><b>📌 최근 진단 · ${esc(r.date)}</b><br><span style="color:var(--text-2);font-size:14.5px">${esc(r.title)} — 1순위 <b>${esc(r.top[0].n)}</b> (${r.top[0].p}%)</span></div><button class="btn btn-ghost" data-open="${r.id}">이전 결과 보기</button></div>` : '';
+}
+
+function chipHTML(list,key){return list.map(x=>`<button type="button" class="chip" data-key="${key}" data-v="${esc(x.l)}" aria-pressed="${state.inputs[key].includes(x.l)}">${x.e?`<span aria-hidden="true">${x.e}</span>`:''}${esc(x.l)}</button>`).join('')}
+function renderQuiz(){
+  $('#chipsInterests').innerHTML=chipHTML(INTERESTS,'interests');
+  $('#chipsTraits').innerHTML=chipHTML(TRAITS,'traits');
+  $('#chipsActivities').innerHTML=chipHTML(ACTIVITIES,'activities');
+  $('#chipsSubjects').innerHTML=chipHTML(SUBJECTS,'subjects');
+  $('#sliders').innerHTML=SLIDERS.map(s=>`<div class="slider"><div class="ends"><span id="${s.id}L">${s.L}</span><span id="${s.id}R" style="text-align:right">${s.R}</span></div>
+    <input type="range" min="1" max="5" step="1" id="${s.id}" value="${state.inputs.sliders[s.id]}" aria-label="${s.L} 또는 ${s.R}" aria-valuetext="">
+    <div class="ticks" aria-hidden="true"><span>매우</span><span>조금</span><span>반반</span><span>조금</span><span>매우</span></div></div>`).join('');
+  SLIDERS.forEach(s=>paintSlider(s.id));
+  $('#customInterest').value=state.inputs.customInterest;
+  $('#hobbyText').value=state.inputs.hobbyText;
+  updateCounts(); kwPreview('customInterest','kwPrev1'); kwPreview('hobbyText','kwPrev3');
+  goStep(state.step,true);
+}
+function paintSlider(id){
+  const v=+state.inputs.sliders[id], s=SLIDERS.find(x=>x.id===id);
+  $('#'+id+'L').classList.toggle('hot',v<3); $('#'+id+'R').classList.toggle('hot',v>3);
+  const txt=v===3?'반반':(v<3?(v===1?'매우 ':'조금 ')+s.L:(v===5?'매우 ':'조금 ')+s.R);
+  $('#'+id).setAttribute('aria-valuetext',txt);
+}
+function updateCounts(){
+  const i=state.inputs;
+  $('#cntInterests').textContent=i.interests.length?`${i.interests.length}개 선택`:'';
+  $('#cntTraits').textContent=i.traits.length?`${i.traits.length}개 선택`:'';
+  $('#cntActivities').textContent=i.activities.length?`${i.activities.length}개 선택`:'';
+  $('#cntSubjects').textContent=i.subjects.length?`${i.subjects.length}개 선택`:'';
+}
+function kwPreview(inputId,outId){
+  const hits=findKw(state.inputs[inputId]);
+  $('#'+outId).innerHTML=hits.length?'인식한 키워드: '+hits.map(h=>`<em>${esc(h.word)}</em> → ${esc(h.label)}`).join(' · '):(state.inputs[inputId]?'아직 인식한 키워드가 없어요. 다른 표현으로도 써 보세요.':'');
+}
+function goStep(n,silent){
+  state.step=n;
+  [1,2,3].forEach(k=>$('#step'+k).hidden=k!==n);
+  document.querySelectorAll('#quizStepbar .st').forEach(el=>{const s=+el.dataset.s;el.classList.toggle('on',s===n);el.classList.toggle('done',s<n)});
+  $('#progBar').style.width=((n-1)/3*100+12)+'%';
+  $('#hint1').textContent='';
+  saveDraft(); if(!silent) window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function runAnalysis(){
+  show('loading');
+  const msgs=['흥미 키워드를 모으는 중…','성향 지도를 그리는 중…','43개 학과와 비교하는 중…','어울리는 직업을 찾는 중…'];
+  let i=0; $('#loadMsg').textContent=msgs[0];
+  const timer=setInterval(()=>{i++; if(i<msgs.length) $('#loadMsg').textContent=msgs[i]},600);
+  setTimeout(()=>{
+    clearInterval(timer);
+    const res=analyze(state.inputs);
+    const rec=saveHistory(res);
+    state.viewing=rec.id;
+    renderResult(res, rec);
+    show('result');
+  },2400);
+}
+function typeTitle(rs){const a=rs[0][0],b=rs[1][0];return `${RIASEC[b].adj} ${RIASEC[a].noun}`}
+function saveHistory(res){
+  const hist=store.get(LS_HIST,[]);
+  const d=new Date();
+  const rec={id:'r'+d.getTime(),date:`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`,
+    inputs:JSON.parse(JSON.stringify(state.inputs)),title:typeTitle(res.riSorted),code:res.riSorted[0][0]+res.riSorted[1][0],
+    ri:res.profile.ri,top:res.ranked.slice(0,4).map(r=>({id:r.m.id,n:r.m.n,p:r.pct}))};
+  hist.unshift(rec); store.set(LS_HIST,hist.slice(0,20)); return rec;
+}
+
+function renderResult(res,rec){
+  const rs=res.riSorted, A=RIASEC[rs[0][0]], B=RIASEC[rs[1][0]], max=Math.max(...rs.map(x=>x[1]),1);
+  const order=['R','I','A','S','E','C'];
+  $('#sumCard').innerHTML=`
+    <div class="type-badges"><span class="type-badge">${A.e} ${A.n}</span><span class="type-badge">${B.e} ${B.n}</span><span class="type-badge" style="color:var(--muted)">📅 ${esc(rec.date)}</span></div>
+    <div class="sum-title">나는 <span style="color:var(--brand)">${B.adj} ${A.noun}</span></div>
+    <p class="sum-desc">${A.d} 여기에 ${B.n}의 모습도 함께 가지고 있어, ${B.d.replace(/요\.$/,'요.')}</p>
+    ${res.topTags.length?`<div class="chips" aria-label="나의 핵심 키워드">${res.topTags.map(t=>`<span class="chip sm"># ${esc(t)}</span>`).join('')}</div>`:''}
+    <div class="riasec" role="img" aria-label="홀랜드 성향 분포: ${rs.map(x=>RIASEC[x[0]].n).join(', ')} 순">
+      ${order.map(k=>`<div class="rb ${k===rs[0][0]||k===rs[1][0]?'top':''}"><div class="bar"><i data-h="${Math.round(res.profile.ri[k]/max*100)}"></i></div><div class="lb">${RIASEC[k].n}<small>${k}</small></div></div>`).join('')}
+    </div>`;
+  requestAnimationFrame(()=>setTimeout(()=>document.querySelectorAll('.rb i').forEach(i=>i.style.height=i.dataset.h+'%'),150));
+
+  const top=res.ranked.slice(0,4);
+  $('#majorList').innerHTML=top.map((r,i)=>{const m=r.m;return `
+    <article class="major fade-in ${i===0?'first':''}" style="animation-delay:${.15+i*.12}s">
+      <span class="rank">${i+1}순위</span>
+      <div class="major-head">
+        <div class="ring" style="--p:${r.pct}" role="img" aria-label="적합도 ${r.pct}퍼센트"><b>${r.pct}<small>%</small></b></div>
+        <div><h3>${esc(m.n)}</h3><span class="field-tag">${esc(m.f)} 계열</span></div>
+      </div>
+      ${r.why.length?`<div class="why">💡 <b>${r.why.map(esc).join(' · ')}</b>에 대한 관심과 잘 맞아요</div>`:''}
+      <dl class="kv"><dt>📘 관련 교과</dt><dd><div class="chips">${m.sub.map(s=>`<span class="chip sm">${esc(s)}</span>`).join('')}</div></dd></dl>
+      <dl class="kv"><dt>🧩 핵심 역량</dt><dd>${m.sk.map(esc).join(', ')}</dd></dl>
+      <dl class="kv"><dt>🔭 진로 전망</dt><dd>${esc(m.o)}</dd></dl>
+      <div class="job-mini">${m.j.map((j,k)=>`<button type="button" data-job="${m.id}:${k}">${j[1]} ${esc(j[0])}</button>`).join('')}</div>
+    </article>`}).join('');
+
+  const jobs=[]; top.slice(0,3).forEach(r=>r.m.j.slice(0,2).forEach((j,k)=>jobs.push({m:r.m,k,j})));
+  $('#jobList').innerHTML=jobs.map((x,i)=>`<button type="button" class="job fade-in" style="animation-delay:${.6+i*.07}s" data-job="${x.m.id}:${x.k}">
+    <span class="je" aria-hidden="true">${x.j[1]}</span><b>${esc(x.j[0])}</b><span>${esc(x.m.n)}</span><span class="more">자세히 보기 →</span></button>`).join('');
+
+  $('#moreList').innerHTML=res.ranked.slice(4,9).map((r,i)=>`<button type="button" class="more-item fade-in" style="animation-delay:${.9+i*.06}s" data-major="${r.m.id}" data-pct="${r.pct}">
+    <span class="pct">${r.pct}%</span><span class="nm">${esc(r.m.n)}<br><span class="fl">${esc(r.m.f)} 계열 · ${r.m.j.map(j=>esc(j[0])).join(', ')}</span></span><span class="minibar" aria-hidden="true"><i style="width:${r.pct}%"></i></span></button>`).join('');
+  state.lastRes={res,rec};
+}
+
+/* ---------- 7. 모달 ---------- */
+let lastFocus=null;
+function openModal(html){lastFocus=document.activeElement;$('#modal').innerHTML=`<button class="close" aria-label="닫기">✕</button>`+html;$('#modalBg').classList.add('open');$('#modalBg').setAttribute('aria-hidden','false');$('#modal .close').focus()}
+function closeModal(){$('#modalBg').classList.remove('open');$('#modalBg').setAttribute('aria-hidden','true');if(lastFocus)lastFocus.focus()}
+function openJob(mid,k){
+  const m=MAJORS.find(x=>x.id===mid), j=m.j[+k];
+  const related=MAJORS.filter(x=>x.j.some(y=>y[0]===j[0])).map(x=>x.n);
+  const sims=m.j.filter((_,i)=>i!==+k);
+  openModal(`<div style="font-size:42px">${j[1]}</div><h3 id="modalTitle">${esc(j[0])}</h3>
+    <p style="font-size:16px">${esc(j[2])}</p>
+    <dl class="kv"><dt>🎓 관련 학과</dt><dd>${related.map(esc).join(', ')}</dd></dl>
+    <dl class="kv"><dt>🧩 필요한 역량</dt><dd>${m.sk.map(esc).join(', ')}</dd></dl>
+    <dl class="kv"><dt>🔗 함께 볼 만한 직업</dt><dd><div class="job-mini" style="padding-top:4px">${sims.map(s=>`<button type="button" data-job="${m.id}:${m.j.indexOf(s)}">${s[1]} ${esc(s[0])}</button>`).join('')}</div></dd></dl>
+    <p class="note" style="margin-top:16px">하는 일, 연봉, 되는 방법 등 더 자세한 정보는 <a href="https://www.career.go.kr" target="_blank" rel="noopener">커리어넷</a>이나 <a href="https://www.work24.go.kr" target="_blank" rel="noopener">고용24 직업정보</a>에서 "${esc(j[0])}"(으)로 검색해 보세요.</p>`);
+}
+function openMajor(mid,pct){
+  const m=MAJORS.find(x=>x.id===mid);
+  openModal(`<span class="field-tag">${esc(m.f)} 계열${pct?` · 적합도 ${pct}%`:''}</span><h3 id="modalTitle">${esc(m.n)}</h3>
+    <p>${esc(m.o)}</p>
+    <dl class="kv"><dt>📘 관련 교과</dt><dd>${m.sub.map(esc).join(', ')}</dd></dl>
+    <dl class="kv"><dt>🧩 핵심 역량</dt><dd>${m.sk.map(esc).join(', ')}</dd></dl>
+    <dl class="kv"><dt>💼 연결되는 직업</dt><dd><div class="job-mini" style="padding-top:4px">${m.j.map((j,k)=>`<button type="button" data-job="${m.id}:${k}">${j[1]} ${esc(j[0])}</button>`).join('')}</div></dd></dl>`);
+}
+
+/* ---------- 8. 공유·저장 ---------- */
+function resultText(){
+  const {res,rec}=state.lastRes; const rs=res.riSorted;
+  let t=`🦋 꿈끼나비 진로 탐색 결과 (${rec.date})\n\n`;
+  t+=`■ 나의 성향: ${RIASEC[rs[0][0]].n}·${RIASEC[rs[1][0]].n} — ${rec.title}\n`;
+  if(res.topTags.length) t+=`■ 핵심 키워드: ${res.topTags.join(', ')}\n`;
+  t+=`■ 선택한 관심 분야: ${state.inputs.interests.join(', ')||'-'}\n\n■ 추천 학과\n`;
+  res.ranked.slice(0,4).forEach((r,i)=>{t+=`${i+1}. ${r.m.n} (${r.pct}%) — 관련 직업: ${r.m.j.map(j=>j[0]).join(', ')}\n`});
+  t+=`\n※ 진로 탐색을 위한 참고 자료입니다. — SchoolKit 꿈끼나비`;
+  return t;
+}
+async function copyText(t){
+  try{await navigator.clipboard.writeText(t);return true}catch(e){
+    const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+    let ok=false;try{ok=document.execCommand('copy')}catch(_){} ta.remove();return ok;}
+}
+async function shareResult(){
+  const t=resultText();
+  if(navigator.share){try{await navigator.share({title:'꿈끼나비 진로 탐색 결과',text:t});return}catch(e){if(e&&e.name==='AbortError')return}}
+  openModal(`<h3 id="modalTitle">결과 공유하기</h3><p>아래 내용을 복사해 상담 기록, 학습지, 메신저 등에 붙여 넣을 수 있어요.</p>
+    <textarea class="field" style="min-height:220px;font-size:13.5px" readonly id="shareTa">${esc(t)}</textarea>
+    <div class="btn-row" style="margin-top:12px"><button class="btn btn-primary" id="btnCopy">📋 텍스트 복사하기</button><button class="btn btn-ghost" id="btnPrint">🖨️ 인쇄·PDF</button></div>`);
+}
+function loadScript(src){return new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)})}
+async function saveImage(){
+  const btn=$('#btnSaveImg'); btn.disabled=true; btn.textContent='이미지 만드는 중…';
+  try{
+    if(!window.html2canvas) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+    const el=$('#resultCapture');
+    el.querySelectorAll('.fade-in').forEach(n=>{n.style.animation='none';n.style.opacity=1;n.style.transform='none'});
+    const bg=getComputedStyle(document.body).backgroundColor;
+    const canvas=await html2canvas(el,{backgroundColor:bg,scale:Math.min(2,window.devicePixelRatio||1.5),useCORS:true,ignoreElements:n=>n.classList&&n.classList.contains('no-print')});
+    const a=document.createElement('a'); a.download=`꿈끼나비_진로결과_${state.lastRes.rec.date.slice(0,10).replace(/\./g,'')}.png`; a.href=canvas.toDataURL('image/png'); a.click();
+    toast('결과 이미지를 저장했어요 📸');
+  }catch(e){toast('이미지 저장이 어려워 인쇄 창을 열게요');setTimeout(()=>window.print(),400)}
+  finally{btn.disabled=false;btn.textContent='⬇ 결과 저장하기'}
+}
+
+/* ---------- 9. 기록·비교 ---------- */
+let selected=[];
+function renderHistory(){
+  const hist=store.get(LS_HIST,[]); selected=selected.filter(id=>hist.some(h=>h.id===id));
+  $('#histList').innerHTML=hist.length?hist.map(h=>`<div class="hist-item ${selected.includes(h.id)?'sel':''}">
+    <input type="checkbox" data-sel="${h.id}" ${selected.includes(h.id)?'checked':''} aria-label="${esc(h.date)} 기록 비교 선택">
+    <div class="meta"><b>${esc(h.title)}</b><small>${esc(h.date)} · ${RIASEC[h.code[0]].n}·${RIASEC[h.code[1]].n}</small>
+      <div style="font-size:13.5px;color:var(--text-2);margin:4px 0 8px">${h.top.slice(0,3).map((t,i)=>`${i+1}. ${esc(t.n)} ${t.p}%`).join('  ')}</div>
+      <div class="acts"><button type="button" data-open="${h.id}">결과 보기</button><button type="button" class="del" data-del="${h.id}">삭제</button></div></div></div>`).join('')
+    :`<div class="empty">아직 저장된 진단 기록이 없어요.<br><button class="btn btn-primary" style="margin-top:12px" data-nav="start">첫 진단 시작하기</button></div>`;
+  $('#btnCompare').disabled=selected.length!==2;
+  $('#btnCompare').textContent=selected.length===2?'선택한 2개 비교하기':`비교할 기록 2개를 골라 주세요 (${selected.length}/2)`;
+  $('#btnClearAll').hidden=!hist.length;
+}
+function renderCompare(){
+  const hist=store.get(LS_HIST,[]); const [a,b]=selected.map(id=>hist.find(h=>h.id===id)).sort((x,y)=>x.id<y.id?-1:1);
+  const names=x=>x.top.map(t=>t.n); const common=names(a).filter(n=>names(b).includes(n));
+  const col=(h,label)=>{const mx=Math.max(...Object.values(h.ri),1);return `<div class="cmp-col"><h4>${label} · ${esc(h.date)}</h4><small style="color:var(--muted)">${esc(h.title)}</small>
+    <div style="margin-top:10px">${['R','I','A','S','E','C'].map(k=>`<div class="hbar"><span>${RIASEC[k].n}</span><div><i style="width:${Math.round(h.ri[k]/mx*100)}%"></i></div></div>`).join('')}</div>
+    <ol>${h.top.map(t=>`<li class="${common.includes(t.n)?'common':''}">${esc(t.n)} <small>${t.p}%</small></li>`).join('')}</ol></div>`};
+  const box=$('#compareBox'); box.hidden=false;
+  box.innerHTML=`<h2 class="sec-title">🔄 진단 결과 비교</h2><p class="sec-sub">${common.length?`두 번 모두 추천된 학과 <b style="color:var(--mint)">${common.map(esc).join(', ')}</b>은(는) 꾸준한 관심일 가능성이 높아요.`:'두 결과에 겹치는 추천 학과가 없어요. 그사이 어떤 경험이 관심을 바꿨는지 떠올려 보세요.'}</p>
+    <div class="compare">${col(a,'이전')}${col(b,'최근')}</div>`;
+  box.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function openRecord(id){
+  const h=store.get(LS_HIST,[]).find(x=>x.id===id); if(!h) return;
+  state.inputs=JSON.parse(JSON.stringify(h.inputs)); state.viewing=id;
+  renderResult(analyze(state.inputs),h); show('result');
+}
+
+/* ---------- 10. 테마 ---------- */
+function applyTheme(t){
+  if(t) document.documentElement.setAttribute('data-theme',t); else document.documentElement.removeAttribute('data-theme');
+  const dark=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+  $('#themeIcon').textContent=dark?'☀️':'🌙'; $('#themeText').textContent=dark?'라이트':'다크';
+  $('#btnTheme').setAttribute('aria-label',dark?'라이트 모드로 전환':'다크 모드로 전환');
+}
+
+/* ---------- 11. 이벤트 ---------- */
+function startFresh(){state.inputs=blankInputs();state.step=1;state.viewing=null;renderQuiz();show('quiz')}
+document.addEventListener('click',e=>{
+  const chip=e.target.closest('.chip[data-key]');
+  if(chip){const key=chip.dataset.key,v=chip.dataset.v,arr=state.inputs[key],i=arr.indexOf(v);
+    if(i>-1)arr.splice(i,1);else arr.push(v); chip.setAttribute('aria-pressed',i===-1); updateCounts(); saveDraft();
+    if(key==='interests'&&arr.length) $('#hint1').textContent=''; return;}
+  const nav=e.target.closest('[data-nav]');
+  if(nav){const v=nav.dataset.nav;
+    if(v==='home') return show('home');
+    if(v==='start') return startFresh();
+    if(v==='analyze') return runAnalysis();
+    if(v==='2'&&state.step===1&&!state.inputs.interests.length&&!findKw(state.inputs.customInterest).length){$('#hint1').textContent='관심 분야를 1개 이상 골라 주세요 🙂';return}
+    return goStep(+v);}
+  const job=e.target.closest('[data-job]'); if(job){const [m,k]=job.dataset.job.split(':');return openJob(m,k)}
+  const mj=e.target.closest('[data-major]'); if(mj) return openMajor(mj.dataset.major,mj.dataset.pct);
+  const op=e.target.closest('[data-open]'); if(op) return openRecord(op.dataset.open);
+  const del=e.target.closest('[data-del]');
+  if(del){if(!confirm('이 기록을 삭제할까요?'))return;store.set(LS_HIST,store.get(LS_HIST,[]).filter(h=>h.id!==del.dataset.del));$('#compareBox').hidden=true;renderHistory();toast('기록을 삭제했어요');return}
+  if(e.target.closest('#modal .close')||e.target===$('#modalBg')) return closeModal();
+  if(e.target.closest('#btnCopy')){copyText($('#shareTa').value).then(ok=>toast(ok?'복사했어요! 원하는 곳에 붙여 넣으세요 📋':'복사에 실패했어요. 직접 선택해 복사해 주세요'));return}
+  if(e.target.closest('#btnPrint')){closeModal();setTimeout(()=>window.print(),200);return}
+  if(e.target.closest('#btnResume')){renderQuiz();show('quiz');return}
+});
+document.addEventListener('change',e=>{
+  if(e.target.matches('[data-sel]')){const id=e.target.dataset.sel;
+    if(e.target.checked){selected.push(id);if(selected.length>2)selected.shift()}else selected=selected.filter(x=>x!==id);
+    renderHistory();}
+});
+document.addEventListener('input',e=>{
+  const id=e.target.id;
+  if(SLIDERS.some(s=>s.id===id)){state.inputs.sliders[id]=+e.target.value;paintSlider(id);saveDraft()}
+  if(id==='customInterest'){state.inputs.customInterest=e.target.value;kwPreview(id,'kwPrev1');if(findKw(e.target.value).length)$('#hint1').textContent='';saveDraft()}
+  if(id==='hobbyText'){state.inputs.hobbyText=e.target.value;kwPreview(id,'kwPrev3');saveDraft()}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#modalBg').classList.contains('open'))closeModal()});
+$('#goHome').onclick=()=>show('home');
+$('#btnStart').onclick=startFresh;
+$('#btnHistory').onclick=()=>{$('#compareBox').hidden=true;show('history')};
+$('#btnTheme').onclick=()=>{const cur=document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');const nx=cur==='dark'?'light':'dark';store.set(LS_THEME,nx);applyTheme(nx)};
+$('#btnRetry').onclick=()=>{if(confirm('입력한 내용을 모두 지우고 처음부터 다시 할까요?\n(지금 결과는 기록에 저장되어 있어요)'))startFresh()};
+$('#btnEdit').onclick=()=>{state.viewing=null;state.step=1;renderQuiz();show('quiz')};
+$('#btnShare').onclick=shareResult;
+$('#btnSaveImg').onclick=saveImage;
+$('#btnCompare').onclick=renderCompare;
+$('#btnClearAll').onclick=()=>{if(confirm('저장된 진단 기록을 모두 지울까요? 되돌릴 수 없어요.')){store.del(LS_HIST);selected=[];$('#compareBox').hidden=true;renderHistory();toast('기록을 모두 지웠어요')}};
+
+/* ---------- 12. 시작 ---------- */
+(function init(){
+  applyTheme(store.get(LS_THEME,null));
+  const d=store.get(LS_DRAFT,null);
+  if(d&&d.inputs){state.inputs=Object.assign(blankInputs(),d.inputs);state.inputs.sliders=Object.assign(blankInputs().sliders,d.inputs.sliders||{});state.step=d.step||1;state.viewing=d.viewing||null}
+  renderQuiz();
+  if(d&&d.screen==='result'&&d.viewing&&store.get(LS_HIST,[]).some(h=>h.id===d.viewing)) openRecord(d.viewing);
+  else if(d&&d.screen==='quiz'&&hasInput(state.inputs)) show('quiz');
+  else if(d&&d.screen==='history') show('history');
+  else show('home');
+})();
+</script>
+</body>
+</html>
